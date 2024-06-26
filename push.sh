@@ -2,7 +2,7 @@
 
 # File names can get wierd sometimes
 # set echo >&2 to avoid pollutions of function capture
-debug_enabled=true
+debug_enabled=false
 debug() {
   if [ "$debug_enabled" = true ]; then
     echo >&2 "$1"
@@ -25,10 +25,10 @@ copy() {
 
   if [[ -d $from && -d $to ]]; then
     debug "Type: Dir, From:'$from', To:'$to'"
-    #cp -r "$from" "$to"
+    cp -r "$from" "$to"
   elif [[ -f $from && -d $(dirname "$to") ]]; then
     debug "Type: File, From:'$from', To:'$to'"
-    #cp "$from" "$to"
+    cp "$from" "$to"
   else
     echo "invalid Path: $from : $to"
   fi
