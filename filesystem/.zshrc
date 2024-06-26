@@ -69,7 +69,6 @@ export PATH="$PATH:/Users/vamuscari/.local/bin"
 
 # For finding mason installs 
 export MASON="$HOME/.local/share/nvim/mason"
-
 # Load Angular CLI autocompletion.
 source <(ng completion script)
 # Add quarto to the path
