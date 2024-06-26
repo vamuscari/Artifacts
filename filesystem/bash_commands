@@ -1,0 +1,2 @@
+# Find file while ignoring all of the permissions denied folders
+find . -iname '*.zsh' 2> >(grep -v -e 'Permission denied' -e 'Operation'  >&2)

@@ -1,0 +1,6 @@
+$HOME/.local/scripts
+$HOME/.config/nvim
+$HOME/.config/fastfetch
+$HOME/.tmux.conf ./tmux/
+$HOME/.zshrc ./filesystem/
+$HOME/.zshenv ./filesystem/
