@@ -2,6 +2,7 @@
 
 # File names can get wierd sometimes
 # set echo >&2 to avoid pollutions of function capture
+# TODO: make this a -d flag on call. Add -t for testing without cp enabled
 debug_enabled=false
 debug() {
   if [ "$debug_enabled" = true ]; then

@@ -1,5 +1,7 @@
 $HOME/.config/nvim/
 $HOME/.config/fastfetch/
-$HOME/.tmux.conf ./tmux/
-$HOME/.zshrc ./filesystem/
-$HOME/.zshenv ./filesystem/
+$HOME/.tmux.conf          ./tmux/
+$HOME/.tmux/sessionizer   ./tmux/
+$HOME/.tmux/ssh_hosts.pl  ./tmux/
+$HOME/.zshrc              ./filesystem/
+$HOME/.zshenv             ./filesystem/
