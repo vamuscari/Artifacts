@@ -18,16 +18,17 @@ copy() {
   if [[ $1 =~ ^([\!-\~]+)[[:space:]]+\.?([\!-\~]+)$ ]]; then
     debug "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]}"
     from="$PWD${BASH_REMATCH[2]%/}"
-    to="${BASH_REMATCH[1]}"
+    to="${BASH_REMATCH[1]%/}"
   fi
 
   base=$(basename "$to")
   from="$from/$base"
+  to=$(dirname "$to")
 
   if [[ -d $from && -d $to ]]; then
     debug "Type: Dir, From:'$from', To:'$to'"
     cp -r "$from" "$to"
-  elif [[ -f $from && -d $(dirname "$to") ]]; then
+  elif [[ -f $from && -d $to ]]; then
     debug "Type: File, From:'$from', To:'$to'"
     cp "$from" "$to"
   else
