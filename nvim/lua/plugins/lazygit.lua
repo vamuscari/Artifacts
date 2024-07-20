@@ -16,10 +16,13 @@ return {
   keys = {
     {
       "<leader>gg",
-      function()
-        require "lazygit"
-      end,
+      ":LazyGit<CR>",
       desc = "LazyGit",
+    },
+    {
+      "<leader>gf",
+      ":LazyGit<CR>",
+      desc = "LazyGit Current File",
     },
   },
 }
