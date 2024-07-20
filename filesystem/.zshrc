@@ -32,6 +32,10 @@ export CLICOLOR=1
 alias ls='ls -G'
 alias ll='ls -lG'
 
+# Tmux Alias
+alias Tm='tmux new-session -A -s Home -c ~'
+
+
 # nvimpager call. $ nman tmux
 nman() { exec man $1 | nvimpager }
 # alias man='nman'

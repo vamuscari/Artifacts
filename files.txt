@@ -1,4 +1,6 @@
 $HOME/.config/nvim/
+$HOME/.config/kitty/
+$HOME/.config/fish/
 $HOME/.config/fastfetch/
 $HOME/.tmux.conf          ./tmux/
 $HOME/.tmux/sessionizer   ./tmux/

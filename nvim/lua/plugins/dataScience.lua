@@ -1,52 +1,4 @@
 return {
-  {
-    "vhyrro/luarocks.nvim",
-    priority = 1001, -- this plugin needs to run before anything else
-    opts = {
-      rocks = { "magick" },
-    },
-  },
-  {
-    "3rd/image.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "luarocks.nvim",
-      {
-        "nvim-treesitter/nvim-treesitter",
-        build = ":TSUpdate",
-        config = function()
-          require("nvim-treesitter.configs").setup {
-            ensure_installed = { "markdown" },
-            highlight = { enable = true },
-          }
-        end,
-      },
-    },
-    opts = {
-      backend = "kitty",
-      integrations = {
-        markdown = {
-          enabled = true,
-          clear_in_insert_mode = false,
-          download_remote_images = true,
-          only_render_image_at_cursor = false,
-          filetypes = { "markdown", "vimwiki" }, -- markdown extensions (ie. quarto) can go here
-        },
-        neorg = {
-          enabled = true,
-          clear_in_insert_mode = false,
-          download_remote_images = true,
-          only_render_image_at_cursor = false,
-          filetypes = { "norg" },
-        },
-      },
-      max_width = nil,
-      max_height = nil,
-      max_width_window_percentage = nil,
-      max_height_window_percentage = 50,
-      kitty_method = "normal",
-    },
-  },
   { -- requires plugins in lua/plugins/treesitter.lua and lua/plugins/lsp.lua
     -- for complete functionality (language features)
     "quarto-dev/quarto-nvim",
@@ -58,7 +10,7 @@ return {
       },
       codeRunner = {
         enabled = true,
-        default_method = "molten",
+        default_method = "slime",
       },
       keymap = {
         hover = "K",
@@ -96,47 +48,6 @@ return {
         },
       },
     },
-  },
-
-  { -- send code from python/r/qmd documets to a terminal or REPL
-    -- like ipython, R, bash
-    "jpalardy/vim-slime",
-    init = function()
-      vim.b["quarto_is_python_chunk"] = false
-      Quarto_is_in_python_chunk = function()
-        require("otter.tools.functions").is_otter_language_context "python"
-      end
-
-      vim.cmd [[
-      let g:slime_dispatch_ipython_pause = 100
-      function SlimeOverride_EscapeText_quarto(text)
-      call v:lua.Quarto_is_in_python_chunk()
-      if exists('g:slime_python_ipython') && len(split(a:text,"\n")) > 1 && b:quarto_is_python_chunk && !(exists('b:quarto_is_r_mode') && b:quarto_is_r_mode)
-      return ["%cpaste -q\n", g:slime_dispatch_ipython_pause, a:text, "--", "\n"]
-      else
-      if exists('b:quarto_is_r_mode') && b:quarto_is_r_mode && b:quarto_is_python_chunk
-      return [a:text, "\n"]
-      else
-      return [a:text]
-      end
-      end
-      endfunction
-      ]]
-
-      vim.g.slime_target = "neovim"
-      vim.g.slime_python_ipython = 1
-    end,
-    config = function()
-      local function mark_terminal()
-        vim.g.slime_last_channel = vim.b.terminal_job_id
-      end
-
-      local function set_terminal()
-        vim.b.slime_config = { jobid = vim.g.slime_last_channel }
-      end
-      vim.keymap.set("n", "<leader>cm", mark_terminal, { desc = "[m]ark terminal" })
-      vim.keymap.set("n", "<leader>cs", set_terminal, { desc = "[s]et terminal" })
-    end,
   },
 
   { -- paste an image from the clipboard or drag-and-drop
@@ -179,8 +90,18 @@ return {
   },
   {
     "benlubas/molten-nvim",
-    dependencies = {
+    {
+      -- see the image.nvim readme for more information about configuring this plugin
       "3rd/image.nvim",
+      opts = {
+        backend = "kitty", -- whatever backend you would like to use
+        max_width = 100,
+        max_height = 12,
+        max_height_window_percentage = math.huge,
+        max_width_window_percentage = math.huge,
+        window_overlap_clear_enabled = true, -- toggles images when windows are overlapped
+        window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "" },
+      },
     },
     lazy = true,
     -- enabled = false,
@@ -188,10 +109,11 @@ return {
     build = ":UpdateRemotePlugins",
     init = function()
       vim.g.molten_image_provider = "image.nvim"
+      vim.g.molten_wrap_output = true
       vim.g.molten_output_win_max_height = 20
       vim.g.molten_virt_lines_off_by_1 = true
       vim.g.molten_virt_text_output = true
-      -- vim.g.molten_auto_open_output = false
+      vim.g.molten_auto_open_output = false
     end,
   },
 }

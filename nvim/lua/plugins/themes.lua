@@ -3,10 +3,24 @@ return {
     "folke/tokyonight.nvim",
     lazy = false,
     priority = 1000,
-    --opts = { style = "moon" },
+    opts = {
+      style = "moon",
+      transparent = true,
+      styles = {
+        sidebars = "transparent",
+        floats = "transparent",
+      },
+    },
     config = function()
       -- load the colorscheme here
       vim.cmd [[colorscheme tokyonight]]
+      function Transparent(color)
+        color = color or "tokyonight"
+        vim.cmd.colorscheme(color)
+        vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+        vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+      end
+      Transparent()
     end,
   },
   {

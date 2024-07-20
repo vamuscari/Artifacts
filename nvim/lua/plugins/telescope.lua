@@ -40,7 +40,7 @@ return {
     { "<leader>:", "<cmd>Telescope command_history<cr>", desc = "[:] Command History" },
     { "<leader><space>", "<cmd>Telescope find_files<cr>", desc = "[ ] Search Project Files" },
     { "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "[/] Search Current Buffer" },
-    { "<leader>fb", "<cmd>Telescope buffers sort_mru=true sort_lastused=true<cr>", desc = "[F]earch [B]uffers" },
+    { "<leader>fb", "<cmd>Telescope buffers sort_mru=true sort_lastused=true<cr>", desc = "[F]iles in [B]uffers" },
     --{ "<leader>fc", LazyVim.telescope.config_files(), desc = "Find Config File" },
     --{ "<leader>ff", LazyVim.telescope "files", desc = "Find Files (Root Dir)" },
     --{ "<leader>fF", LazyVim.telescope("files", { cwd = false }), desc = "Find Files (cwd)" },
