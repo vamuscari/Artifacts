@@ -39,3 +39,8 @@ luac.out
 *.x86_64
 *.hex
 
+# System files
+.DS_Store
+
+# Generated Docs
+EmmyLua.spoon/
