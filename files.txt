@@ -3,6 +3,7 @@ $HOME/.config/kitty/
 $HOME/.config/fish/
 $HOME/.config/fastfetch/
 $HOME/.hammerspoon/init.lua  ./hammerspoons/
+$HOME/.hammerspoon/Spoons/   ./hammerspoons/
 $HOME/.tmux.conf             ./tmux/
 $HOME/.tmux/sessionizer      ./tmux/
 $HOME/.tmux/ssh_hosts.pl     ./tmux/
