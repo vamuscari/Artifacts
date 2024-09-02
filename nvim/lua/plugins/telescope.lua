@@ -58,10 +58,10 @@ return {
     { "<leader>sD", "<cmd>Telescope diagnostics<cr>", desc = "[S]earch Workspace [D]iagnostics " },
     { "<leader>sg", "<cmd>Telescope live_grep<cr>", desc = "[S]earch by [G]rep" },
     --{ "<leader>sG", LazyVim.telescope("live_grep", { cwd = false }), desc = "Grep (cwd)" },
-    { "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "[S]earch [H]elp" },
+    { "<leader>sH", "<cmd>Telescope help_tags<cr>", desc = "[S]earch [H]elp" },
     { "<leader>st", "<cmd>Telescope builtin<cr>", desc = "[S]earch [T]elescope" }, -- Search Select
 
-    { "<leader>sH", "<cmd>Telescope highlights<cr>", desc = "[S]earch [H]ighlight Groups" },
+    { "<leader>sh", "<cmd>Telescope highlights<cr>", desc = "[S]earch [H]ighlight Groups" },
     { "<leader>sk", "<cmd>Telescope keymaps<cr>", desc = "[S]earch [K]eymaps" },
     { "<leader>sM", "<cmd>Telescope man_pages<cr>", desc = "[Search] [M]an Pages" },
     { "<leader>sm", "<cmd>Telescope marks<cr>", desc = "[S]earch [M]arks" },
@@ -75,15 +75,6 @@ return {
     --{ "<leader>sw", LazyVim.telescope "grep_string", mode = "v", desc = "Selection (Root Dir)" },
     --{ "<leader>sW", LazyVim.telescope("grep_string", { cwd = false }), mode = "v", desc = "Selection (cwd)" },
     --{ "<leader>uC", LazyVim.telescope("colorscheme", { enable_preview = true }), desc = "Colorscheme with Preview" },
-    --   {
-    --     "<leader>ss",
-    --     function()
-    --       require("telescope.builtin").lsp_document_symbols {
-    --         symbols = require("lazyvim.config").get_kind_filter(),
-    --       }
-    --     end,
-    --     desc = "Goto Symbol",
-    --   },
     --   {
     --     "<leader>sS",
     --     function()
@@ -193,8 +184,8 @@ TODO: lazy vim actions. might be worth recreating
           i = {
             ["<c-t>"] = open_with_trouble,
             ["<a-t>"] = open_selected_with_trouble,
-            ["<a-i>"] = find_files_no_ignore,
-            ["<a-h>"] = find_files_with_hidden,
+            --["<a-i>"] = find_files_no_ignore,
+            --["<a-h>"] = find_files_with_hidden,
             ["<C-Down>"] = actions.cycle_history_next,
             ["<C-Up>"] = actions.cycle_history_prev,
             ["<C-f>"] = actions.preview_scrolling_down,

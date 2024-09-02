@@ -31,7 +31,8 @@ return {
       {
         "-",
         function()
-          require("mini.files").open()
+          require("mini.files").open(vim.api.nvim_buf_get_name(0), false)
+          require("mini.files").reveal_cwd()
         end,
         mode = "n",
         desc = "Explorer",
@@ -39,7 +40,7 @@ return {
       {
         "<leader>fm",
         function()
-          require("mini.files").open()
+          require("mini.files").open(vim.api.nvim_buf_get_name(0))
         end,
         mode = "n",
         desc = "[F]iles [M]ini",
@@ -49,12 +50,12 @@ return {
       require("mini.files").setup {
         mappings = {
           close = "q",
-          go_in = "L",
-          go_in_plus = "l",
-          go_out = "H",
+          go_in = "l",
+          go_in_plus = "<CR>",
+          go_out = "-",
           go_out_plus = "h",
           --reset = "<BS>",
-          reset = "-",
+          reset = "",
           reveal_cwd = "@",
           show_help = "g?",
           synchronize = "=",
@@ -62,6 +63,19 @@ return {
           trim_right = ">",
         },
       }
+      local files_set_cwd = function(path)
+        -- Works only if cursor is on the valid file system entry
+        local cur_entry_path = MiniFiles.get_fs_entry().path
+        local cur_directory = vim.fs.dirname(cur_entry_path)
+        vim.fn.chdir(cur_directory)
+      end
+
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniFilesBufferCreate",
+        callback = function(args)
+          vim.keymap.set("n", "<leader>wd", files_set_cwd, { desc = "Set Workspace Dir", buffer = args.data.buf_id })
+        end,
+      })
     end,
   },
 }

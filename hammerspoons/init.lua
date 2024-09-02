@@ -1,12 +1,15 @@
 -- hs.loadSpoon("EmmyLua")
 
+-- TODO: move mouse on focus
 hs.hotkey.bind("cmd", ".", function()
 	AppToggle("kitty")
+	--hs.application.launchOrFocus("kitty")
 end)
 
 -- Arc Auto Hide
-hs.hotkey.bind("cmd", ",", function()
+hs.hotkey.bind("cmd", "/", function()
 	AppToggle("Arc")
+	--hs.application.launchOrFocus("Arc")
 end)
 
 function HideApp(app)
@@ -41,6 +44,11 @@ function AppStatusAlert(app)
 	else
 		hs.alert.show("App not running")
 	end
+end
+
+-- TODO: Move window left
+function MoveFocusedLeft()
+	local focused = hs.application.frontmostApplication()
 end
 
 -- hs.hotkey.bind({ "cmd", "alt", "ctrl" }, "W", function()

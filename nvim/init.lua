@@ -10,6 +10,8 @@ vim.uv = vim.uv or vim.loop
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+Project_Dir = os.getenv "PROJECT_DIR"
+
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
@@ -21,7 +23,6 @@ if not vim.uv.fs_stat(lazypath) then
     lazypath,
   }
 end
-
 
 -- Add lazy to the `runtimepath`, this allows us to `require` it.
 vim.opt.rtp:prepend(lazypath)
@@ -51,7 +52,7 @@ require("lazy").setup {
       -- disable some rtp plugins
       disabled_plugins = {
         "gzip",
-        -- "matchit",
+        "matchit",
         -- "matchparen",
         -- "netrwPlugin",
         "tarPlugin",

@@ -11,7 +11,7 @@ return {
       { "<leader>r", group = "[R]un/debug" },
       { "<leader>s", group = "[S]earch" },
       { "<leader>u", group = "[U]i" },
-      { "<leader>w", group = "[W]indows" },
+      { "<leader>w", group = "[W]orkspace" },
       { "<leader>x", group = "diagnostics/quickfix" },
       { "[", group = "prev" },
       { "]", group = "next" },

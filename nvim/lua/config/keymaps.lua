@@ -36,15 +36,6 @@ set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Up" })
 set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move Down" })
 set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move Up" })
 
--- NOTE: I cannot remember the last time I switched buffers like this. FZF FTW
--- buffers
--- set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
--- set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
--- set("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
--- set("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
--- set("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
--- set("n", "<leader>`", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
-
 -- Clear search with <esc>
 set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and Clear hlsearch" })
 
@@ -114,19 +105,18 @@ set("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
 -- highlights under cursor
 set("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
 
+set("v", "<leader>/", 'y/<C-R>"<CR>', { desc = "Visual Search" })
+
 -- Terminal Mappings
-set("t", "<esc><esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
 set("t", "<C-h>", "<cmd>wincmd h<cr>", { desc = "Go to Left Window" })
 set("t", "<C-j>", "<cmd>wincmd j<cr>", { desc = "Go to Lower Window" })
 set("t", "<C-k>", "<cmd>wincmd k<cr>", { desc = "Go to Upper Window" })
 set("t", "<C-l>", "<cmd>wincmd l<cr>", { desc = "Go to Right Window" })
-set("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
-set("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
 
 -- windows
-set("n", "<leader>ww", "<C-W>p", { desc = "Other Window", remap = true })
-set("n", "<leader>wd", "<C-W>c", { desc = "Delete Window", remap = true })
-set("n", "<leader>w-", "<C-W>s", { desc = "Split Window Below", remap = true })
-set("n", "<leader>w|", "<C-W>v", { desc = "Split Window Right", remap = true })
-set("n", "<leader>-", "<C-W>s", { desc = "Split Window Below", remap = true })
-set("n", "<leader>|", "<C-W>v", { desc = "Split Window Right", remap = true })
+-- set("n", "<leader>ww", "<C-W>p", { desc = "Other Window", remap = true })
+-- set("n", "<leader>wd", "<C-W>c", { desc = "Delete Window", remap = true })
+-- set("n", "<leader>w-", "<C-W>s", { desc = "Split Window Below", remap = true })
+-- set("n", "<leader>w|", "<C-W>v", { desc = "Split Window Right", remap = true })
+-- set("n", "<leader>-", "<C-W>s", { desc = "Split Window Below", remap = true })
+-- set("n", "<leader>|", "<C-W>v", { desc = "Split Window Right", remap = true })
