@@ -135,9 +135,9 @@ return { -- LSP Configuration & Plugins
         --
         -- This may be unwanted, since they displace some of your code
         if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-          map("<leader>uh", function()
+          map("<leader>nh", function()
             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-          end, "[U]i Toggle Inlay [H]ints")
+          end, "[N]vim Toggle Inlay [H]ints")
         end
       end,
     })

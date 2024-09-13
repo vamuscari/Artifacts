@@ -77,15 +77,16 @@ return {
     },
     config = function(_, opts)
       require("img-clip").setup(opts)
-      vim.keymap.set("n", "<leader>ii", ":PasteImage<cr>", { desc = "insert [i]mage from clipboard" })
+      vim.keymap.set("n", "<leader>pi", ":PasteImage<cr>", { desc = "insert [i]mage from clipboard" })
     end,
   },
 
   { -- preview equations
     "jbyuki/nabla.nvim",
+    lazy = true,
     ft = { "ipynb", "quarto", "qmd" },
     keys = {
-      { "<leader>um", ':lua require"nabla".toggle_virt()<cr>', desc = "[U]i toggle [m]ath equations" },
+      { "<leader>nm", ':lua require"nabla".toggle_virt()<cr>', desc = "[N]vim toggle [m]ath equations" },
     },
   },
   {

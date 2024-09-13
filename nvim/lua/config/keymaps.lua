@@ -43,7 +43,7 @@ set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and Clear hlsea
 -- taken from runtime/lua/_editor.lua
 set(
   "n",
-  "<leader>ur",
+  "<leader>nr",
   "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
   { desc = "Redraw / Clear hlsearch / Diff Update" }
 )
@@ -103,7 +103,7 @@ set("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })
 set("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
 
 -- highlights under cursor
-set("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
+set("n", "<leader>ni", vim.show_pos, { desc = "Inspect Pos" })
 
 set("v", "<leader>/", 'y/<C-R>"<CR>', { desc = "Visual Search" })
 
