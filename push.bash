@@ -1,88 +1,243 @@
 #!/bin/bash
 
+# TODO: Sync by last modified date 
+
+# Text Colors
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+blue='\033[0;34m'
+magenta='\033[0;35m'
+cyan='\033[0;36m'
+clear='\033[0m'
+
+r_flag='false' # remove pre-existing files
+files='files.txt' # file with paths
+verbose='false' # print lots of things
+
+print_usage() {
+  printf "Usage: ..."
+}
+
+while getopts 'rf:v' flag; do
+  case "${flag}" in
+    r) r_flag='true' ;;
+    f) files="${OPTARG}" ;;
+    v) verbose='true' ;;
+    # *) print_usage
+    #   exit 1 ;;
+  esac
+done
+
 # File names can get wierd sometimes
-# set echo >&2 to avoid pollutions of function capture
-# TODO: make this a -d flag on call. Add -t for testing without cp enabled
-debug_enabled=false
-debug() {
-  if [ "$debug_enabled" = true ]; then
-    echo >&2 "$1"
+# set echo >&2 to avoid pollution of function capture
+verbose() {
+  if [ "$verbose" = true ]; then
+    echo -e >&2 "${yellow}$1${clear}"
   fi
 }
 
+log() {
+  echo -e >&2 "$1"
+}
 # Files are identified by a / at the end
 # if the file name is left unspecified cp will use its current one hence just pwd
 copy() {
-  from="$PWD"
-  to="$1"
-  if [[ $1 =~ ^([\!-\~]+)[[:space:]]+\.?([\!-\~]+)$ ]]; then
-    debug "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]}"
-    from="$PWD${BASH_REMATCH[2]%/}"
-    to="${BASH_REMATCH[1]%/}"
+  verbose " "
+  verbose "copy "
+  local super=false
+  local type="Unknown" 
+  local overwrite=false
+  local overwrite_type="unknown"
+
+  log "name $name"
+  if [[ ! -e $from ]]; then
+    log "${red}Failed${clear}: Item does not exist, $from"
+    return
   fi
 
-  base=$(basename "$to")
-  from="$from/$base"
-  to=$(dirname "$to")
+  if [[ ! -r $from ]]; then
+    log "Missing read permission: '$from'"
+    super=$( elevate_prompt )
+    if [[ "$super" = false ]]; then
+      log "${red}Failed${clear}: Missing permissions, $from"
+      return
+    fi
+  fi
 
-  if [[ -d $from && -d $to ]]; then
-    debug "Type: Dir, From:'$from', To:'$to'"
-    cp -r "$from" "$to"
-  elif [[ -f $from && -d $to ]]; then
-    debug "Type: File, From:'$from', To:'$to'"
-    cp "$from" "$to"
+  type=$( path_type $from )
+
+  if [[ "$type" = "Unkown" ]]; then
+    log "${red}Failed${clear} Invalid type: $from "
+    return 
+  fi
+
+  verbose "Type: $type, From:'$from', To:'$to'"
+
+  if [[ ! -d $to ]]; then
+    log "${red}Failed${clear}: Not a directory, $to"
+    return
+  fi
+
+  if [[ ! -w $to && "$super" = false ]]; then
+    log "Missing write permission: '$to'"
+    super=$( bool_prompt "Would you like to run as sudo?(N,y)" )
+    if [[ "$super" = false ]]; then
+      log "${red}Failed${clear}: Missing permissions, $to"
+      return
+    fi
+  fi
+
+  if [[ -e "$to/$name" ]]; then
+
+    overwrite=true 
+
+    if [[ ! -w "$to/$name" && "$super" = false ]]; then
+      log "Missing write permission: '$to/$name'"
+      super=$( bool_prompt "Would you like to run as sudo?(N,y)" )
+      if [[ "$super" = false ]]; then
+        log "${red}Failed${clear}: Missing permissions, $to/$name"
+        return
+      fi
+    fi
+
+    overwrite_type=$( path_type "$to/$name" )
+
+    if [[ "$overwrite_type" = "Unkown" ]]; then
+      log "${red}Failed${clear} Invalid type: $to/$name "
+      return 
+    fi
+
+    if [[ "$overwrite_type" != "$type" ]]; then
+      log "${yellow}Warn${clear}: Mismatch overwrite type $type -> $overwrite_type"
+      approve_mismatch=$( bool_prompt "Would you like to continue?(N,y)" )
+      if [[ "$approve_mismatch" = false ]]; then
+        log "${red}Failed${clear}: Mismatch types, $type -> $overwrite_type"
+        return
+      fi
+    fi
+
+    if [[ "$r_flag" = true ]]; then
+      if [[ "$overwrite_type" = "Directory" ]]; then
+        elevate_run $super "rm -r $to/$name"
+        if [ "$?" -ne "0" ]; then
+          log "${red}Failed${clear}: Could not delete pre-existing folder"
+          return
+        fi
+        verbose "Removed pre-existing folder: '$to/$name'"
+      fi
+
+
+      if [[ "$overwrite_type" = "File" ]]; then
+        elevate_run $super "rm $to/$name"
+        if [ "$?" -ne "0" ]; then
+          log "${red}Failed${clear}: Could not delete pre-existing file"
+          return
+        fi
+        verbose "Removed pre-existing file: '$to/$name'"
+      fi
+    fi
+  fi
+
+
+  if [[ "$type" = "Directory" ]]; then
+    elevate_run $super "cp -r $from $to"
+    if [ "$?" -ne "0" ]; then
+      log "${red}Failed${clear}"
+      return
+    fi
+  fi
+
+  if [[ "$type" = "File" ]]; then
+    elevate_run $super "cp $from $to"
+    if [ "$?" -ne "0" ]; then
+      log "${red}Failed${clear}"
+      return
+    fi
+  fi
+
+  if [[ -e "$to/$name" ]]; then
+    log "${green}Success${clear}: $to/$name"
+  fi
+
+}
+
+bool_prompt(){
+  read  -p "$1" -n 1 -r </dev/tty
+  log " "
+  if [[ $REPLY =~ ^[Yy]$ ]];
+  then
+    echo true
+  else 
+    echo false
+  fi
+}
+
+elevate_run(){
+  if [[ "$1" = true ]]; then
+    return $( sudo $2 )
+  else 
+    return $( $2 )
+  fi
+}
+
+path_type() {
+  if [[ -d $1 ]]; then
+    echo "Directory" 
+  elif [[ -L $1 ]]; then
+    echo "Link" 
+  elif [[ -f $1 ]]; then
+    echo "File" 
   else
-    echo "invalid Path: $from : $to"
+    echo "Unkown"
   fi
+  return 
+}
+
+
+
+parse_path() {
+  local -n f="$1" t="$2" b="$3"
+  t=$(homeSub "$4")
+
+  if [[ $t =~ ^([[:alnum:]+=\-_/.\\]+)[[:space:]]+\.([[:alnum:]+=\-_/.\\]+) ]]; then
+    verbose "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]} "
+    f="$PWD${BASH_REMATCH[2]%/}"
+    t="${BASH_REMATCH[1]%/}"
+  else
+    f="$PWD"
+  fi
+
+  b=$(basename $t)
+  f="$f/$b"
+  t=$(dirname "$t")
+
+  verbose " " 
+  verbose "parse_path " 
+  verbose "From: $f" 
+  verbose "To: $t" 
+
 }
 
 # Simple match for home identity then replace with actual env
 # BASH_REMATCH is the output of =~ and groups.
 homeSub() {
   re='(\$HOME|~)(.*)'
-  if [[ $line =~ $re ]]; then
-    debug "homesub regex match"
+  if [[ $1 =~ $re ]]; then
+    # verbose "homesub regex match"
     echo "$HOME${BASH_REMATCH[2]}"
+  else
+    # verbose "homesub no match"
+    echo "$1"
   fi
 }
+
 
 # Read input from file one line at a time.
 while read -r line || [ -n "$line" ]; do
-  newpath=$(homeSub "$line")
-  copy "$newpath"
-done <files.txt
-
-#!/bin/bash
-
-# File names can get wierd sometimes
-# set echo >&2 to avoid pollutions of function capture
-debug_enabled=false
-debug() {
-  if [ "$debug_enabled" = true ]; then
-    echo >&2 "$1"
-  fi
-}
-
-# Files are identified by a / at the end
-# if the file name is left unspecified cp will use its current one hence just pwd
-# TODO: There is probably a better way to do this
-copy() {
-
-  in="$1"
-  out="$PWD"
-  if [[ $1 =~ ^([\!-\~]+)[[:space:]]+\.?([\!-\~]+)$ ]]; then
-    debug "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]}"
-    in="${BASH_REMATCH[1]}"
-    out="$PWD${BASH_REMATCH[2]}"
-  fi
-
-  if [[ -d $in && -d $out ]]; then
-    debug "Type: Dir, From:'$in', To:'$out'"
-    cp -r "$in" "$out"
-  elif [[ -f $in && -d $out ]]; then
-    debug "Type: File, From:'$in', To:'$out'"
-    cp "$in" "$out"
-  else
-    echo "Invalid Path: $in : $out"
-  fi
-}
+  verbose " " 
+  verbose "-------------------------------------------" 
+  verbose "Pushing: $line" 
+  parse_path from to name "$line"
+  copy "$from" "$to"
+done <"$files"
