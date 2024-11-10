@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO: Sync by last modified date 
-
 # Text Colors
 red='\033[0;31m'
 green='\033[0;32m'
@@ -11,46 +9,47 @@ magenta='\033[0;35m'
 cyan='\033[0;36m'
 clear='\033[0m'
 
-r_flag='false' # remove pre-existing files
+
+delete='false' # remove pre-existing files
+test='false' # test run with no actual changes
 files='files.txt' # file with paths
 verbose='false' # print lots of things
 
-print_usage() {
-  printf "Usage: ..."
-}
 
-while getopts 'rf:v' flag; do
+while getopts 'df:vt' flag; do
   case "${flag}" in
-    r) r_flag='true' ;;
+    d) delete='true' ;;
     f) files="${OPTARG}" ;;
     v) verbose='true' ;;
-    # *) print_usage
-    #   exit 1 ;;
+    t) test='true' ;;
   esac
 done
 
+
 # File names can get wierd sometimes
 # set echo >&2 to avoid pollution of function capture
+log() {
+  echo -e >&2 "$1"
+}
+
+# Verbose is basically just debug
 verbose() {
   if [ "$verbose" = true ]; then
     echo -e >&2 "${yellow}$1${clear}"
   fi
 }
 
-log() {
-  echo -e >&2 "$1"
-}
 # Files are identified by a / at the end
 # if the file name is left unspecified cp will use its current one hence just pwd
 copy() {
   verbose " "
   verbose "copy "
+  local from="$1" to="$2" name="$3"
   local super=false
   local type="Unknown" 
   local overwrite=false
   local overwrite_type="unknown"
 
-  log "name $name"
   if [[ ! -e $from ]]; then
     log "${red}Failed${clear}: Item does not exist, $from"
     return
@@ -162,6 +161,7 @@ copy() {
 
 }
 
+# Yes or No Prompt with return answer
 bool_prompt(){
   read  -p "$1" -n 1 -r </dev/tty
   log " "
@@ -174,7 +174,9 @@ bool_prompt(){
 }
 
 elevate_run(){
-  if [[ "$1" = true ]]; then
+  if [[ "$test"  = true ]]; then
+    return $(log "${magenta}Execute${clear}: $2")
+  elif [[ "$1" = true ]]; then
     return $( sudo $2 )
   else 
     return $( $2 )
@@ -196,26 +198,26 @@ path_type() {
 
 
 
-parse_path() {
-  local -n f="$1" t="$2" b="$3"
-  t=$(homeSub "$4")
+parse_path_push() {
+  from="" to="" name=""
+  to=$(homeSub "$1")
 
-  if [[ $t =~ ^([[:alnum:]+=\-_/.\\]+)[[:space:]]+\.([[:alnum:]+=\-_/.\\]+) ]]; then
+  if [[ $to =~ ^([[:alnum:]+=\-_/.\\]+)[[:space:]]+\.([[:alnum:]+=\-_/.\\]+) ]]; then
     verbose "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]} "
-    f="$PWD${BASH_REMATCH[2]%/}"
-    t="${BASH_REMATCH[1]%/}"
+    from="$PWD${BASH_REMATCH[2]%/}"
+    to="${BASH_REMATCH[1]%/}"
   else
-    f="$PWD"
+    from="$PWD"
   fi
 
-  b=$(basename $t)
-  f="$f/$b"
-  t=$(dirname "$t")
+  name=$(basename $to)
+  from="$from/$name"
+  to=$(dirname "$to")
 
   verbose " " 
   verbose "parse_path " 
-  verbose "From: $f" 
-  verbose "To: $t" 
+  verbose "From: $from" 
+  verbose "To: $to" 
 
 }
 
@@ -238,6 +240,6 @@ while read -r line || [ -n "$line" ]; do
   verbose " " 
   verbose "-------------------------------------------" 
   verbose "Pushing: $line" 
-  parse_path from to name "$line"
-  copy "$from" "$to"
+  parse_path_push "$line"
+  copy "$from" "$to" "$name"
 done <"$files"

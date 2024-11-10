@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: Sync by last modified date 
+
 # Text Colors
 red='\033[0;31m'
 green='\033[0;32m'
@@ -193,27 +195,39 @@ path_type() {
   return 
 }
 
+parse_re='^([[:alnum:]+=\-_/.\\]+)[[:space:]]+\.([[:alnum:]+=\-_/.\\]+)'
+
 parse_path_pull() {
-  from="" to="" name=""
   from=$(homeSub "$1")
 
-  if [[ $from =~ ^([[:alnum:]+=\-_/.\\]+)[[:space:]]+\.([[:alnum:]+=\-_/.\\]+) ]]; then
-    verbose "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]} "
-    from="${BASH_REMATCH[1]%/}"
-    to="$PWD${BASH_REMATCH[2]%/}"
+  if [[ $from =~ "$parse_re" ]]; then
+    verbose "has multipath  ${bash_rematch[1]} : ${bash_rematch[2]} "
+    from="${bash_rematch[1]%/}"
+    to="$PWD${bash_rematch[2]%/}"
   else
     to="$PWD"
   fi
 
   name=$(basename $from)
-
-  verbose " " 
-  verbose "parse_path " 
-  verbose "From: $from" 
-  verbose "To: $to" 
-  verbose "Name: $name" 
-
 }
+
+parse_path_push() {
+  to=$(homesub "$1")
+
+  if [[ $to =~ "$parse_re" ]]; then
+    verbose "has multipath  ${bash_rematch[1]} : ${bash_rematch[2]} "
+    from="$PWD${bash_rematch[2]%/}"
+    to="${bash_rematch[1]%/}"
+  else
+    from="$pwd"
+  fi
+
+  name=$(basename $to)
+  from="$from/$name"
+  to=$(dirname "$to")
+}
+
+
 
 # Simple match for home identity then replace with actual env
 # BASH_REMATCH is the output of =~ and groups.
@@ -221,7 +235,7 @@ homeSub() {
   re='(\$HOME|~)(.*)'
   if [[ $1 =~ $re ]]; then
     # verbose "homesub regex match"
-    echo "$HOME${BASH_REMATCH[2]}"
+    echo "$HOME${bash_rematch[2]}"
   else
     # verbose "homesub no match"
     echo "$1"
@@ -233,6 +247,13 @@ while read -r line || [ -n "$line" ]; do
   verbose " " 
   verbose "-------------------------------------------" 
   verbose "Pulling: $line" 
+  from="" to="" name=""
   parse_path_pull "$line"
+
+  verbose " " 
+  verbose "parse_path " 
+  verbose "From: $from" 
+  verbose "To: $to" 
+  verbose "Name: $name" 
   copy "$from" "$to" "$name"
 done <"$files"
