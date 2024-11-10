@@ -4,8 +4,8 @@ $HOME/.config/fish/
 $HOME/.config/fastfetch/
 $HOME/.hammerspoon/init.lua  ./hammerspoons/
 $HOME/.hammerspoon/Spoons/   ./hammerspoons/
-$HOME/.tmux.conf             ./tmux/
-$HOME/.tmux/sessionizer      ./tmux/
-$HOME/.tmux/ssh_hosts.pl     ./tmux/
+$HOME/.config/tmux/tmux.conf             ./tmux/
+$HOME/.config/tmux/sessionizer      ./tmux/
+$HOME/.config/tmux/ssh_hosts.pl     ./tmux/
 $HOME/.zshrc                 ./filesystem/
 $HOME/.zshenv                ./filesystem/
