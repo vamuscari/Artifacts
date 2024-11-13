@@ -1,11 +1,6 @@
 $HOME/.config/nvim/
 $HOME/.config/kitty/
-$HOME/.config/fish/
-$HOME/.config/fastfetch/
-$HOME/.hammerspoon/init.lua  ./hammerspoons/
-$HOME/.hammerspoon/Spoons/   ./hammerspoons/
 $HOME/.config/tmux/tmux.conf             ./tmux/
 $HOME/.config/tmux/sessionizer      ./tmux/
 $HOME/.config/tmux/ssh_hosts.pl     ./tmux/
 $HOME/.zshrc                 ./filesystem/
-$HOME/.zshenv                ./filesystem/

@@ -1,0 +1,3 @@
+$HOME/.config/nvim/
+$HOME/.config/kitty/
+$HOME/.zshrc                 ./filesystem/

@@ -85,23 +85,23 @@ copy() {
     fi
   fi
 
-  if [[ -e "$to/$name" ]]; then
+  if [[ -e "$to$name" ]]; then
 
     overwrite=true 
 
-    if [[ ! -w "$to/$name" && "$super" = false ]]; then
-      log "Missing write permission: '$to/$name'"
+    if [[ ! -w "$to$name" && "$super" = false ]]; then
+      log "Missing write permission: '$to$name'"
       super=$( bool_prompt "Would you like to run as sudo?(N,y)" )
       if [[ "$super" = false ]]; then
-        log "${red}Failed${clear}: Missing permissions, $to/$name"
+        log "${red}Failed${clear}: Missing permissions, $to$name"
         return
       fi
     fi
 
-    overwrite_type=$( path_type "$to/$name" )
+    overwrite_type=$( path_type "$to$name" )
 
     if [[ "$overwrite_type" = "Unkown" ]]; then
-      log "${red}Failed${clear} Invalid type: $to/$name "
+      log "${red}Failed${clear} Invalid type: $to$name "
       return 
     fi
 
@@ -116,28 +116,29 @@ copy() {
 
     if [[ "$r_flag" = true ]]; then
       if [[ "$overwrite_type" = "Directory" ]]; then
-        elevate_run $super "rm -r $to/$name"
+        elevate_run $super "rm -r $to$name"
         if [ "$?" -ne "0" ]; then
           log "${red}Failed${clear}: Could not delete pre-existing folder"
           return
         fi
-        verbose "Removed pre-existing folder: '$to/$name'"
+        verbose "Removed pre-existing folder: '$to$name'"
       fi
 
 
       if [[ "$overwrite_type" = "File" ]]; then
-        elevate_run $super "rm $to/$name"
+        elevate_run $super "rm $to$name"
         if [ "$?" -ne "0" ]; then
           log "${red}Failed${clear}: Could not delete pre-existing file"
           return
         fi
-        verbose "Removed pre-existing file: '$to/$name'"
+        verbose "Removed pre-existing file: '$to$name'"
       fi
     fi
   fi
 
 
   if [[ "$type" = "Directory" ]]; then
+    from="${from%/}"
     elevate_run $super "cp -r $from $to"
     if [ "$?" -ne "0" ]; then
       log "${red}Failed${clear}"
@@ -153,8 +154,10 @@ copy() {
     fi
   fi
 
-  if [[ -e "$to/$name" ]]; then
-    log "${green}Success${clear}: $to/$name"
+  if [[ -e "$to$name" ]]; then
+    log "${green}Success${clear}: $to$name"
+  else
+    log "${red}Failed${clear}: $to$name"
   fi
 
 }
@@ -197,12 +200,12 @@ parse_path_pull() {
   from="" to="" name=""
   from=$(homeSub "$1")
 
-  if [[ $from =~ ^([[:alnum:]+=\-_/.\\]+)[[:space:]]+\.([[:alnum:]+=\-_/.\\]+) ]]; then
+  if [[ $from =~ ^([[:alnum:]+=\-_/.\\]+)[[:space:]]+\.?/?([[:alnum:]+=\-_/.\\]+) ]]; then
     verbose "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]} "
     from="${BASH_REMATCH[1]%/}"
-    to="$PWD${BASH_REMATCH[2]%/}"
+    to="$PWD/${BASH_REMATCH[2]%/}"
   else
-    to="$PWD"
+    to="$PWD/"
   fi
 
   name=$(basename $from)
