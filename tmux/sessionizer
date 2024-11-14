@@ -5,7 +5,7 @@
 if [[ $# -eq 1 ]]; then
   selected=$1
 else
-  selected=$(find ~/Repos -mindepth 1 -maxdepth 1 -type d | fzf --tmux 80%)
+  selected=$(find ~/Repos -mindepth 1 -maxdepth 1 -type d | fzf)
 fi
 
 if [[ -z $selected ]]; then
@@ -29,3 +29,5 @@ if [[ -z $TMUX ]]; then
 else
   tmux switch-client -t "$selected_name"
 fi
+
+exit 1
