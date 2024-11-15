@@ -2,7 +2,8 @@ $HOME/.config/nvim/
 $HOME/.config/kitty/
 $HOME/.config/tmux/tmux.conf       ./tmux/
 $HOME/.config/tmux/sessionizer     ./tmux/
+$HOME/.config/tmux/configs         ./tmux/
 $HOME/.config/tmux/ssh_hosts.pl    ./tmux/
 $HOME/.config/tmux/fzfp            ./tmux/
-$HOME/.config/tmux/fzf-panes.tmux  ./tmux/
 $HOME/.zshrc                       ./filesystem/
+$HOME/.bashrc                      ./filesystem/
