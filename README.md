@@ -1,8 +1,8 @@
-# Vans Vim Build 
+# Artifacts‎
 
-# Lazy.nvim is a core part of the build. The plugins folder is explicitly all lazy installs
-![image](https://user-images.githubusercontent.com/292349/208301737-68fb279c-ba70-43ef-a369-8c3e8367d6b1.png)
+Artifacts is a personal repository archiving dot files, scripts, and documentation.
+This is not a singular project per say, but a collection of information on my developer workflow.
 
-## references
-- [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim)
-- [lazy.nvim](https://github.com/folke/lazy.nvim)
+
+
+This repo was made for personal use but feel free to look or copy.
