@@ -10,7 +10,8 @@ vim.uv = vim.uv or vim.loop
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-Project_Dir = os.getenv "PROJECT_DIR"
+Project_Dir = os.getenv "TSX_PROJECT_DIR"
+Project_Name = os.getenv "TSX_PROJECT_NAME"
 
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
@@ -42,7 +43,7 @@ require("lazy").setup {
     -- import plugins
     { import = "plugins" },
   },
-  checker = { enabled = true }, -- automatically check for plugin updates
+  checker = { enabled = false }, -- automatically check for plugin updates
   change_detection = {
     notify = false,
   },

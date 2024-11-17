@@ -10,11 +10,11 @@ compinit
 
 
 # Check for $PROJECT_IR that is declared on sessionizer
-if [[ $PROJECT_DIR ]]; then
+if [[ $TSX_PROJECT_DIR ]]; then
     # cd $PROJECT_DIR
 		# If noe current pipenv running check for one the run it.
     if [ ! -n "${PIPENV_ACTIVE+1}" ]; then
-				if [[ -f $PROJECT_DIR/Pipfile ]]; then
+				if [[ -f $TSX_PROJECT_DIR/Pipfile ]]; then
 							pipenv shell --quiet
 				fi
     fi
