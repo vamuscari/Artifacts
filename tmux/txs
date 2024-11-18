@@ -2,19 +2,13 @@
 
 ################################################################################
 #                           TMUX Sesisonizer
-#
-#                           By: Van Muscari
-#                        Inspired By: Primagen
-#                         Updated: 2024/11/16
+#                         Updated: 2024/11/18
 #
 #         The TMUX Sessionizer is a tool for creating or switching 
 #         sessions in tmux by (project / directory) names.
 #
 #
 ################################################################################
-
-
-#Find Directory
 
 
 usage="\
@@ -32,23 +26,23 @@ Options:
 Examples
  1.) Open a single directory with no selection
 
-      txs ~/My_Project
+      tmux-sessionizer ~/My_Project
 
  2.) Fuzzy find between multiple projects
 
-      txs ~/My_Project1 ~/My_Project2
+      tmux-sessionizer ~/My_Project1 ~/My_Project2
 
  3.) Fuzzy Find a project folder in a directory
 
-      txs -r ~/My_Repos
+      tmux-sessionizer -r ~/My_Repos
 
  4.) Open a directory with as specified session name
 
-      txs -n Projcet ~/My_Project
+      tmux-sessionizer -n Projcet ~/My_Project
 
  5.) Fuzzy Find a project folders in multiple directories
 
-      txs -r ~/My_Repos ~/My_Configs
+      tmux-sessionizer -r ~/My_Repos ~/My_Configs
 --------------------------------------------------------------------------------
 "
 
@@ -224,7 +218,6 @@ select_directory(){
   local stop_icon=$( printf "${yellow}${clear}" ) 
 
   if "$preview"; then
-    # TMUX changes all periods(.) to underscores(_)
     preview_script="\
         session_name=\"\$( echo {-1} | sed 's/\\./_/g' )\"
         tmux capture-pane -ept \$session_name 2>/dev/null
@@ -253,7 +246,7 @@ get_name(){
 
   if [[ "$name" = '' ]]; then 
 
-    if ! name=$( basename "$1" | tr . _ ); then
+    if ! name=$( basename "$1" | tr . _ | tr : _ ); then
       log "${red}Error${clear}: Getting baename failed, $selected_dir"
       return 1
     fi 
