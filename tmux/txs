@@ -112,6 +112,12 @@ verbose() {
   fi
 }
 
+
+# set echo >&2 to avoid pollution of function capture
+err() {
+  echo -e >&2 "${yellow}Error:${clear} $1"
+}
+
 open_session(){
   local name=$1
   local dir=$2
@@ -125,23 +131,26 @@ open_session(){
     verbose "New Session 1"
     tmux new-session -s "$name" -c "$dir" \
     -e "TSX_PROJECT_DIR=\"$dir\"" -e "TSX_PROJECT_NAME=\"$name\""
-    exit 0
+    return 0
   fi
 
   if ! tmux has-session -t="$name" 2>/dev/null; then
     verbose "New Session 2"
     tmux new-session -ds "$name" -c "$dir" \
     -e "TSX_PROJECT_DIR=\"$dir\"" -e "TSX_PROJECT_NAME=\"$name\""
+    return 0
   fi
 
   if [[ -z $TMUX ]]; then
     verbose "Attatch Session"
     tmux attach -t "$name"
+    return 0
   else
     tmux switch-client -t "$name"
+    return 0
   fi
 
-  exit 1
+  return 1
 }
 
 test_directories(){
@@ -264,17 +273,20 @@ if [[ $dirs = "" ]]; then
   exit 2
 fi
 
+
 verbose "Directory Count: $#"
 
 if [[ $recursive = false && $# = 1  ]]; then
 
   if ! test_directories $dirs ; then
+   err "test_directories"
    exit 1
   fi
   
   selected_dir="$dirs"
 
   if ! get_name $selected_dir; then
+    err "get_name"
     exit 1
   fi 
   
@@ -287,16 +299,19 @@ fi
 if [[ $recursive = false ]]; then
 
   if ! test_directories $dirs ; then
+   err "test_directories"
    exit 1
   fi
 
   dirs=$( tmux_session_status $dirs | sort )
 
   if ! select_directory $dirs; then
+   err "select_directory"
    exit 1
   fi
 
   if ! get_name $selected_dir; then
+    err "get_name"
     exit 1
   fi 
 
@@ -308,20 +323,26 @@ fi
 if [[ $recursive = true ]]; then
 
   if ! test_directories $dirs ; then
+   err "test_directories"
    exit 1
   fi
 
   if ! get_sub_directories $dirs; then
+    err "get_sub_directories"
     exit 1
   fi
 
   sub_dirs=$( tmux_session_status $sub_dirs | sort )
 
+  verbose "Sub-Directory Count: ${#sub_dirs[@]}"
+
   if ! select_directory "$sub_dirs"; then
+    err "select_directory"
    exit 1
   fi
 
   if ! get_name $selected_dir; then
+    err "get_name"
     exit 1
   fi 
 
@@ -330,6 +351,6 @@ if [[ $recursive = true ]]; then
   exit 0
 fi
 
-exit 0
+exit 1
 
 
