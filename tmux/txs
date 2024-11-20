@@ -122,29 +122,22 @@ open_session(){
   verbose "Directory: $dir"
 
   if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    verbose "New Session 1"
-    tmux new-session -s "$name" -c "$dir" \
+    tmux new-session -A -s "$name" -c "$dir" \
     -e "TSX_PROJECT_DIR=\"$dir\"" -e "TSX_PROJECT_NAME=\"$name\""
-    return 0
-  fi
-
-  if ! tmux has-session -t="$name" 2>/dev/null; then
-    verbose "New Session 2"
-    tmux new-session -ds "$name" -c "$dir" \
-    -e "TSX_PROJECT_DIR=\"$dir\"" -e "TSX_PROJECT_NAME=\"$name\""
-    return 0
   fi
 
   if [[ -z $TMUX ]]; then
-    verbose "Attatch Session"
-    tmux attach -t "$name"
-    return 0
-  else
-    tmux switch-client -t "$name"
-    return 0
+    tmux new-session -Ad -s "$name" -c "$dir" \
+    -e "TSX_PROJECT_DIR=\"$dir\"" -e "TSX_PROJECT_NAME=\"$name\""
   fi
 
-  return 1
+  if [[ -z $TMUX ]]; then
+    tmux attach -t "$name" 
+  elif [[ $name -ne "$( tmux display-message -p '#S' )" ]]; then
+    tmux switch-client -t "$name" 
+  fi 
+   
+  return 0
 }
 
 test_directories(){
@@ -344,6 +337,6 @@ if [[ $recursive = true ]]; then
   exit 0
 fi
 
-exit 1
+exit 0
 
 
