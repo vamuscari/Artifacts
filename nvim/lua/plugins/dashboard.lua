@@ -1,7 +1,6 @@
 return {
   {
     "vamuscari/dashboard-nvim",
-    dir = "~/Repos/dashboard-nvim",
     event = "VimEnter",
     config = function()
       require("dashboard").setup {
