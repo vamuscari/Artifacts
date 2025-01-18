@@ -10,8 +10,8 @@ vim.uv = vim.uv or vim.loop
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-Project_Dir = os.getenv "TSX_PROJECT_DIR"
-Project_Name = os.getenv "TSX_PROJECT_NAME"
+Project_Dir = os.getenv "TMUX_SESSIONIZER_PROJECT_DIR"
+Project_Name = os.getenv "TMUX_SESSIONIZER_PROJECT_NAME"
 
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then

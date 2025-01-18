@@ -195,7 +195,7 @@ path_type() {
   return 
 }
 
-parse_re='^([[:alnum:]+=\-_/.\\]+)[[:space:]]+\.([[:alnum:]+=\-_/.\\]+)'
+parse_re='^([[:alnum:]+=_/.\\-]+)[[:space:]]+\.([[:alnum:]+=_/.\\-]+)'
 
 parse_path_pull() {
   from=$(homeSub "$1")

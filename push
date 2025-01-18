@@ -202,7 +202,7 @@ parse_path_push() {
   from="" to="" name=""
   to=$(homeSub "$1")
 
-  if [[ $to =~ ^([[:alnum:]+=\-_/.\\]+)[[:space:]]+\.([[:alnum:]+=\-_/.\\]+) ]]; then
+  if [[ $to =~ ^([[:alnum:]+=_/.\\-]+)[[:space:]]+\.([[:alnum:]+=_/.\\-]+) ]]; then
     verbose "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]} "
     from="$PWD${BASH_REMATCH[2]%/}"
     to="${BASH_REMATCH[1]%/}"
