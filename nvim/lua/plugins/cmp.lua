@@ -65,6 +65,7 @@ return {
           ["<C-b>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<C-leader>"] = cmp.mapping.complete(),
+          ["<Tab>"] = cmp.mapping.complete(),
           ["<C-e>"] = cmp.mapping.abort(),
           ["<C-CR>"] = function(fallback)
             cmp.abort()

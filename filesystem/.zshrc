@@ -10,12 +10,12 @@ compinit
 
 
 # Check for $PROJECT_IR that is declared on sessionizer
-if [[ $TSX_PROJECT_DIR ]]; then
+if [[ $TMUX_SESSIONIZER_PROJECT_DIR ]]; then
     # cd $PROJECT_DIR
 		# If noe current pipenv running check for one the run it.
     if [ ! -n "${PIPENV_ACTIVE+1}" ]; then
-				if [[ -f $TSX_PROJECT_DIR/Pipfile ]]; then
-							pipenv shell --quiet
+				if [[ -f $TMUX_SESSIONIZER_PROJECT_DIR/Pipfile ]]; then
+							pipenv shell
 				fi
     fi
 fi
@@ -49,6 +49,8 @@ alias vim='nvim'
 PATH="/usr/local/bin:$PATH"
 PATH="/opt/homebrew/bin:$PATH"
 
+DEV_CERT="~/.local/certs/mbp.cer"
+DEV_KEY="~/.local/certs/mbp.pem"
 
 # zsh syntax zsh-syntax-highlighting
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

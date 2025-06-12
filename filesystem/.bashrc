@@ -27,11 +27,11 @@ fi
 unset rc
 
 # Check for $PROJECT_IR that is declared on sessionizer
-if [[ $PROJECT_DIR ]]; then
+if [[ $TMUX_SESSIONIZER_PROJECT_DIR ]]; then
     # cd $PROJECT_DIR
 		# If noe current pipenv running check for one the run it.
     if [ ! -n "${PIPENV_ACTIVE+1}" ]; then
-				if [[ -f $PROJECT_DIR/Pipfile ]]; then
+				if [[ -f $TMUX_SESSIONIZER_PROJECT_DIR/Pipfile ]]; then
 							pipenv shell --quiet
 				fi
     fi
