@@ -63,130 +63,198 @@ elevate_prompt(){
   bool_prompt "Would you like to run as sudo?(N,y)"
 }
 
-copy() {
-  verbose " "
-  verbose "copy "
-  local from="$1" to="$2" name="$3"
-  local super=false
-  local type="Unknown" 
-  local overwrite=false
-  local overwrite_type="unknown"
 
-  if [[ ! -e $from ]]; then
-    log "${red}Failed${clear}: Item does not exist, $from"
-    return
+# Check if the source item exists and has the correct permissions
+check_source() {
+  local source=$1
+  local super=$2
+
+  if [[ ! -e $source ]]; then
+    log "${red}Failed${clear}: Item does not exist, $source"
+    return 1
   fi
 
-  if [[ ! -r $from ]]; then
-    log "Missing read permission: '$from'"
-    super=$( elevate_prompt )
+  if [[ ! -r $source ]]; then
+    log "Missing read permission: '$source'"
+    super=$(elevate_prompt)
     if [[ "$super" = false ]]; then
-      log "${red}Failed${clear}: Missing permissions, $from"
-      return
+      log "${red}Failed${clear}: Missing permissions, $source"
+      echo "$super"
+      return 1
     fi
   fi
 
-  type=$( path_type $from )
+  echo "$super"
+  return 0
+}
 
-  if [[ "$type" = "Unknown" ]]; then
-    log "${red}Failed${clear} Invalid type: $from "
-    return 
+# Check if the destination directory exists and has the correct permissions
+check_destination() {
+  local destination=$1
+  local super=$2
+
+  if [[ "$push" = true && ! -d $destination ]]; then
+    verbose "Destination directory does not exist, creating: $destination"
+    elevate_run "$super" "mkdir -p $destination"
   fi
 
-  verbose "Type: $type, From:'$from', To:'$to'"
-
-  if [[ "$push" = true && ! -d $to ]]; then
-    verbose "Destination directory does not exist, creating: $to"
-    elevate_run $super "mkdir -p $to"
+  if [[ ! -d $destination ]]; then
+    log "${red}Failed${clear}: Not a directory, $destination"
+    echo "$super"
+    return 1
   fi
 
-  if [[ ! -d $to ]]; then
-    log "${red}Failed${clear}: Not a directory, $to"
-    return
-  fi
-
-  if [[ ! -w $to && "$super" = false ]]; then
-    log "Missing write permission: '$to'"
-    super=$( bool_prompt "Would you like to run as sudo?(N,y)" )
+  if [[ ! -w $destination && "$super" = false ]]; then
+    log "Missing write permission: '$destination'"
+    super=$(elevate_prompt)
     if [[ "$super" = false ]]; then
-      log "${red}Failed${clear}: Missing permissions, $to"
-      return
+      log "${red}Failed${clear}: Missing permissions, $destination"
+      echo "$super"
+      return 1
     fi
   fi
+
+  echo "$super"
+  return 0
+}
+
+# Handle overwriting existing items
+handle_overwrite() {
+  local from=$1
+  local to=$2
+  local name=$3
+  local type=$4
+  local super=$5
 
   if [[ -e "$to/$name" ]]; then
-
-    overwrite=true 
-
     if [[ ! -w "$to/$name" && "$super" = false ]]; then
       log "Missing write permission: '$to/$name'"
-      super=$( bool_prompt "Would you like to run as sudo?(N,y)" )
+      super=$(elevate_prompt)
       if [[ "$super" = false ]]; then
         log "${red}Failed${clear}: Missing permissions, $to/$name"
-        return
+        echo "$super"
+        return 1
       fi
     fi
 
-    overwrite_type=$( path_type "$to/$name" )
+    local overwrite_type
+    overwrite_type=$(path_type "$to/$name")
 
     if [[ "$overwrite_type" = "Unknown" ]]; then
       log "${red}Failed${clear} Invalid type: $to/$name "
-      return 
+      echo "$super"
+      return 1
     fi
 
     if [[ "$overwrite_type" != "$type" ]]; then
       log "${yellow}Warn${clear}: Mismatch overwrite type $type -> $overwrite_type"
-      approve_mismatch=$( bool_prompt "Would you like to continue?(N,y)" )
+      local approve_mismatch
+      approve_mismatch=$(bool_prompt "Would you like to continue?(N,y)")
       if [[ "$approve_mismatch" = false ]]; then
         log "${red}Failed${clear}: Mismatch types, $type -> $overwrite_type"
-        return
+        echo "$super"
+        return 1
       fi
     fi
 
     if [[ "$delete" = true ]]; then
       if [[ "$overwrite_type" = "Directory" ]]; then
-        elevate_run $super "rm -r $to/$name"
+        elevate_run "$super" "rm -r $to/$name"
         if [ "$?" -ne "0" ]; then
           log "${red}Failed${clear}: Could not delete pre-existing folder"
-          return
+          echo "$super"
+          return 1
         fi
         verbose "Removed pre-existing folder: '$to/$name'"
       fi
 
-
       if [[ "$overwrite_type" = "File" ]]; then
-        elevate_run $super "rm $to/$name"
+        elevate_run "$super" "rm $to/$name"
         if [ "$?" -ne "0" ]; then
           log "${red}Failed${clear}: Could not delete pre-existing file"
-          return
+          echo "$super"
+          return 1
         fi
         verbose "Removed pre-existing file: '$to/$name'"
       fi
     fi
   fi
 
+  echo "$super"
+  return 0
+}
+
+# Copy the item from source to destination
+perform_copy() {
+  local from=$1
+  local to=$2
+  local type=$3
+  local super=$4
 
   if [[ "$type" = "Directory" ]]; then
-    elevate_run $super "cp -r $from $to"
+    elevate_run "$super" "cp -r $from $to"
     if [ "$?" -ne "0" ]; then
       log "${red}Failed${clear}"
-      return
+      return 1
     fi
   fi
 
   if [[ "$type" = "File" ]]; then
-    elevate_run $super "cp $from $to"
+    elevate_run "$super" "cp $from $to"
     if [ "$?" -ne "0" ]; then
       log "${red}Failed${clear}"
-      return
+      return 1
     fi
   fi
+
+  return 0
+}
+
+copy() {
+  verbose " "
+  verbose "copy "
+  local from="$1" to="$2" name="$3"
+  local super=false
+  local type
+  local result
+
+  result=$(check_source "$from" "$super")
+  if [[ $? -ne 0 ]]; then
+    super=$result
+    return 1
+  fi
+  super=$result
+
+  type=$(path_type "$from")
+
+  if [[ "$type" = "Unknown" ]]; then
+    log "${red}Failed${clear} Invalid type: $from "
+    return 1
+  fi
+
+  verbose "Type: $type, From:'$from', To:'$to'"
+
+  result=$(check_destination "$to" "$super")
+  if [[ $? -ne 0 ]]; then
+    super=$result
+    return 1
+  fi
+  super=$result
+
+  result=$(handle_overwrite "$from" "$to" "$name" "$type" "$super")
+  if [[ $? -ne 0 ]]; then
+    super=$result
+    return 1
+  fi
+  super=$result
+
+  perform_copy "$from" "$to" "$type" "$super" || return 1
 
   if [[ -e "$to/$name" ]]; then
     log "${green}Success${clear}: $to/$name"
   fi
-
 }
+
 
 bool_prompt(){
   read  -p "$1" -n 1 -r </dev/tty
@@ -232,26 +300,12 @@ parse_path_pull() {
 
   if [[ $from =~ $parse_re ]]; then
     verbose "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]} "
-    from="${BASH_REMATCH[1]% /}"
-    to="$PWD/${BASH_REMATCH[2]% /}"
-  else
-    to="$PWD"
-  fi
-
-  name=$(basename $from)
-}
-
-
-parse_path_pull() {
-  from=$(homeSub "$1")
-
-  if [[ $from =~ $parse_re ]]; then
-    verbose "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]} "
     from="${BASH_REMATCH[1]%/}"
     local dest_path="${BASH_REMATCH[2]%/}"
     dest_path="${dest_path#./}"
     to="$PWD/$dest_path"
   else
+    from="${from%/}"
     to="$PWD"
   fi
 
