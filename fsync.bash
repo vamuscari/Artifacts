@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#  fsync: a config sync tool
+#  by: Van Muscari
+#  Sync config files between a git repo and your file system.
+#  Using a list of files with the sync paths, 
+#  fsync can push configs into the system or pull them in after making changes.
+
+# TODO: Sync by last modified date 
+
 # Text Colors
 red='\033[0;31m'
 green='\033[0;32m'
@@ -9,18 +17,30 @@ magenta='\033[0;35m'
 cyan='\033[0;36m'
 clear='\033[0m'
 
+push='false' # push to the system
 delete='false' # remove pre-existing files
 test='false' # test run
 files='files.txt' # file with paths
 verbose='false' # print lots of things
 
+usage() {
+  echo "Usage: $0 [-p] [-d] [-f files] [-v] [-t]"
+  echo "  -p: Push to the system"
+  echo "  -d: Delete pre-existing files"
+  echo "  -f: File with paths (default: files.txt)"
+  echo "  -v: Verbose mode"
+  echo "  -t: Test run"
+  exit 1
+}
 
-while getopts 'df:vt' flag; do
+while getopts 'pdf:vt' flag; do
   case "${flag}" in
+    p) push='true' ;;
     d) delete='true' ;;
     f) files="${OPTARG}" ;;
     v) verbose='true' ;;
     t) test='true' ;;
+    *) usage ;;
   esac
 done
 
@@ -39,6 +59,10 @@ verbose() {
 
 # Files are identified by a / at the end
 # if the file name is left unspecified cp will use its current one hence just pwd
+elevate_prompt(){
+  bool_prompt "Would you like to run as sudo?(N,y)"
+}
+
 copy() {
   verbose " "
   verbose "copy "
@@ -64,12 +88,17 @@ copy() {
 
   type=$( path_type $from )
 
-  if [[ "$type" = "Unkown" ]]; then
+  if [[ "$type" = "Unknown" ]]; then
     log "${red}Failed${clear} Invalid type: $from "
     return 
   fi
 
   verbose "Type: $type, From:'$from', To:'$to'"
+
+  if [[ "$push" = true && ! -d $to ]]; then
+    verbose "Destination directory does not exist, creating: $to"
+    elevate_run $super "mkdir -p $to"
+  fi
 
   if [[ ! -d $to ]]; then
     log "${red}Failed${clear}: Not a directory, $to"
@@ -85,23 +114,23 @@ copy() {
     fi
   fi
 
-  if [[ -e "$to$name" ]]; then
+  if [[ -e "$to/$name" ]]; then
 
     overwrite=true 
 
-    if [[ ! -w "$to$name" && "$super" = false ]]; then
-      log "Missing write permission: '$to$name'"
+    if [[ ! -w "$to/$name" && "$super" = false ]]; then
+      log "Missing write permission: '$to/$name'"
       super=$( bool_prompt "Would you like to run as sudo?(N,y)" )
       if [[ "$super" = false ]]; then
-        log "${red}Failed${clear}: Missing permissions, $to$name"
+        log "${red}Failed${clear}: Missing permissions, $to/$name"
         return
       fi
     fi
 
-    overwrite_type=$( path_type "$to$name" )
+    overwrite_type=$( path_type "$to/$name" )
 
-    if [[ "$overwrite_type" = "Unkown" ]]; then
-      log "${red}Failed${clear} Invalid type: $to$name "
+    if [[ "$overwrite_type" = "Unknown" ]]; then
+      log "${red}Failed${clear} Invalid type: $to/$name "
       return 
     fi
 
@@ -114,31 +143,30 @@ copy() {
       fi
     fi
 
-    if [[ "$r_flag" = true ]]; then
+    if [[ "$delete" = true ]]; then
       if [[ "$overwrite_type" = "Directory" ]]; then
-        elevate_run $super "rm -r $to$name"
+        elevate_run $super "rm -r $to/$name"
         if [ "$?" -ne "0" ]; then
           log "${red}Failed${clear}: Could not delete pre-existing folder"
           return
         fi
-        verbose "Removed pre-existing folder: '$to$name'"
+        verbose "Removed pre-existing folder: '$to/$name'"
       fi
 
 
       if [[ "$overwrite_type" = "File" ]]; then
-        elevate_run $super "rm $to$name"
+        elevate_run $super "rm $to/$name"
         if [ "$?" -ne "0" ]; then
           log "${red}Failed${clear}: Could not delete pre-existing file"
           return
         fi
-        verbose "Removed pre-existing file: '$to$name'"
+        verbose "Removed pre-existing file: '$to/$name'"
       fi
     fi
   fi
 
 
   if [[ "$type" = "Directory" ]]; then
-    from="${from%/}"
     elevate_run $super "cp -r $from $to"
     if [ "$?" -ne "0" ]; then
       log "${red}Failed${clear}"
@@ -154,10 +182,8 @@ copy() {
     fi
   fi
 
-  if [[ -e "$to$name" ]]; then
-    log "${green}Success${clear}: $to$name"
-  else
-    log "${red}Failed${clear}: $to$name"
+  if [[ -e "$to/$name" ]]; then
+    log "${green}Success${clear}: $to/$name"
   fi
 
 }
@@ -175,11 +201,14 @@ bool_prompt(){
 
 elevate_run(){
   if [[ "$test"  = true ]]; then
-    return $(log "${magenta}Execute${clear}: $2")
+    log "${magenta}Execute${clear}: $2"
+    return 0
   elif [[ "$1" = true ]]; then
-    return $( sudo $2 )
+    sudo bash -c "$2"
+    return $?
   else 
-    return $( $2 )
+    bash -c "$2"
+    return $?
   fi
 }
 
@@ -191,32 +220,63 @@ path_type() {
   elif [[ -f $1 ]]; then
     echo "File" 
   else
-    echo "Unkown"
+    echo "Unknown"
   fi
   return 
 }
 
+parse_re='^([[:alnum:]+=_/\\.\\-]+)[[:space:]]+([[:alnum:]+=_/\\.\\-]+)'
+
 parse_path_pull() {
-  from="" to="" name=""
   from=$(homeSub "$1")
 
-  if [[ $from =~ ^([[:alnum:]+=\-_/.\\]+)[[:space:]]+\.?/?([[:alnum:]+=\-_/.\\]+) ]]; then
+  if [[ $from =~ $parse_re ]]; then
     verbose "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]} "
-    from="${BASH_REMATCH[1]%/}"
-    to="$PWD/${BASH_REMATCH[2]%/}"
+    from="${BASH_REMATCH[1]% /}"
+    to="$PWD/${BASH_REMATCH[2]% /}"
   else
-    to="$PWD/"
+    to="$PWD"
   fi
 
   name=$(basename $from)
-
-  verbose " " 
-  verbose "parse_path " 
-  verbose "From: $from" 
-  verbose "To: $to" 
-  verbose "Name: $name" 
-
 }
+
+
+parse_path_pull() {
+  from=$(homeSub "$1")
+
+  if [[ $from =~ $parse_re ]]; then
+    verbose "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]} "
+    from="${BASH_REMATCH[1]%/}"
+    local dest_path="${BASH_REMATCH[2]%/}"
+    dest_path="${dest_path#./}"
+    to="$PWD/$dest_path"
+  else
+    to="$PWD"
+  fi
+
+  name=$(basename "$from")
+}
+
+
+parse_path_push() {
+  to=$(homeSub "$1")
+
+  if [[ $to =~ $parse_re ]]; then
+    verbose "has multipath  ${BASH_REMATCH[1]} : ${BASH_REMATCH[2]} "
+    local source_path="${BASH_REMATCH[2]%/}"
+    source_path="${source_path#./}"
+    from="$PWD/$source_path/$(basename "${BASH_REMATCH[1]}")"
+    to="${BASH_REMATCH[1]%/}"
+  else
+    from="$PWD/$(basename "$to")"
+  fi
+
+  name=$(basename "$to")
+  to=$(dirname "$to")
+}
+
+
 
 # Simple match for home identity then replace with actual env
 # BASH_REMATCH is the output of =~ and groups.
@@ -231,11 +291,38 @@ homeSub() {
   fi
 }
 
-# Read input from file one line at a time.
-while read -r line || [ -n "$line" ]; do
-  verbose " " 
-  verbose "-------------------------------------------" 
-  verbose "Pulling: $line" 
-  parse_path_pull "$line"
-  copy "$from" "$to" "$name"
-done <"$files"
+main(){
+  if [[ "$push" = true ]]; then
+    while read -r line || [ -n "$line" ]; do
+      verbose " " 
+      verbose "-------------------------------------------" 
+      verbose "Pushing: $line" 
+      from="" to="" name=""
+      parse_path_push "$line"
+
+      verbose " " 
+      verbose "parse_path " 
+      verbose "From: $from" 
+      verbose "To: $to" 
+      verbose "Name: $name" 
+      copy "$from" "$to" "$name"
+    done <"$files"
+  else
+    while read -r line || [ -n "$line" ]; do
+      verbose " " 
+      verbose "-------------------------------------------" 
+      verbose "Pulling: $line" 
+      from="" to="" name=""
+      parse_path_pull "$line"
+
+      verbose " " 
+      verbose "parse_path " 
+      verbose "From: $from" 
+      verbose "To: $to" 
+      verbose "Name: $name" 
+      copy "$from" "$to" "$name"
+    done <"$files"
+  fi
+}
+
+main

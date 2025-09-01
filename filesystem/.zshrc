@@ -49,8 +49,8 @@ alias vim='nvim'
 PATH="/usr/local/bin:$PATH"
 PATH="/opt/homebrew/bin:$PATH"
 
-DEV_CERT="~/.local/certs/mbp.cer"
-DEV_KEY="~/.local/certs/mbp.pem"
+export DEV_CERT=$HOME"/.local/certs/dev.cer"
+export DEV_KEY=$HOME"/.local/certs/dev.pem"
 
 # zsh syntax zsh-syntax-highlighting
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
