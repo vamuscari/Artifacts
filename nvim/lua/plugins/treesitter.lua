@@ -3,7 +3,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     version = false,
     build = ":TSUpdate",
-    brach = "main",
+    branch = "main",
     lazy = false,
     config = function()
       local configs = require "nvim-treesitter.configs"
@@ -20,6 +20,7 @@ return {
 
           -- Mobile
           "dart",
+          "swift",
 
           -- Web
           "html",

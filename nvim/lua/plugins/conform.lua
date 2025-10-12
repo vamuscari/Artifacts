@@ -25,6 +25,12 @@ return { -- Autoformat
     end,
     formatters_by_ft = {
       lua = { "stylua" },
+      sh = { "shfmt" },
+      bash = { "shfmt" },
+      zsh = { "shfmt" },
+      -- Swift formatting: swift-format (Apple) or swiftformat (Nick Lockwood)
+      -- Install via: brew install swift-format OR brew install swiftformat
+      swift = { "swiftformat", "swift-format", stop_after_first = true },
       -- Conform can also run multiple formatters sequentially
       -- python = { "isort", "black" },
       --

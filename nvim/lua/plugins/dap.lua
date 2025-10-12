@@ -9,15 +9,51 @@ return {
       "theHamsta/nvim-dap-virtual-text",
       "nvim-neotest/nvim-nio",
       "williamboman/mason.nvim",
+      "jay-babu/mason-nvim-dap.nvim", -- Automatic DAP adapter installation
     },
     config = function()
       local dap = require "dap"
       local ui = require "dapui"
 
+      -- Setup mason-nvim-dap for automatic adapter installation
+      require("mason-nvim-dap").setup({
+        automatic_installation = true,
+        handlers = {},
+        ensure_installed = {
+          "codelldb", -- For Swift/C/C++/Rust debugging
+        },
+      })
+
       require("dapui").setup()
       require("dap-go").setup()
       require("dap-python").setup "python"
       --require("dap-python").setup "$MASON/packages/debugpy/venv/bin/python"
+
+      -- Configure codelldb adapter for Swift/C/C++
+      dap.adapters.codelldb = {
+        type = "server",
+        port = "${port}",
+        executable = {
+          command = vim.fn.stdpath("data") .. "/mason/bin/codelldb",
+          args = { "--port", "${port}" },
+        },
+      }
+
+      -- Swift debugging configuration
+      dap.configurations.swift = {
+        {
+          name = "Launch iOS App",
+          type = "codelldb",
+          request = "launch",
+          program = function()
+            -- This will be populated by xcodebuild.nvim integration
+            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+          end,
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+          waitFor = true,
+        },
+      }
 
       require("nvim-dap-virtual-text").setup {
         -- This just tries to mitigate the chance that I leak tokens here. Probably won't stop it from happening...

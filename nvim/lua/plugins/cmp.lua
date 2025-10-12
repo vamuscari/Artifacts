@@ -12,6 +12,13 @@ return {
   },
   { "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
   {
+    "hrsh7th/vim-vsnip",
+    config = function()
+      -- Set vsnip snippet directory
+      vim.g.vsnip_snippet_dir = vim.fn.stdpath("config") .. "/snippets"
+    end,
+  },
+  {
     "hrsh7th/nvim-cmp",
     version = false,
     lazy = false,
@@ -65,12 +72,16 @@ return {
           ["<C-b>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<C-leader>"] = cmp.mapping.complete(),
-          ["<Tab>"] = cmp.mapping.complete(),
           ["<C-e>"] = cmp.mapping.abort(),
-          ["<C-CR>"] = function(fallback)
-            cmp.abort()
-            fallback()
-          end,
+          ["<CR>"] = cmp.mapping.abort(),
+          ["<Tab>"] = cmp.mapping.confirm { select = true },
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
         },
         sources = cmp.config.sources({
           { name = "nvim_lsp" },

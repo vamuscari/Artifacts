@@ -206,6 +206,8 @@ return { -- LSP Configuration & Plugins
     vim.list_extend(ensure_installed, {
       "stylua", -- Used to format Lua code
       "shfmt",
+      -- Note: swift-format is installed via Homebrew, not Mason
+      -- Note: sourcekit-lsp is installed via Xcode/Swift toolchain, not Mason
     })
     require("mason-tool-installer").setup { ensure_installed = ensure_installed }
 

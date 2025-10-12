@@ -1,0 +1,186 @@
+{
+  "Function": {
+    "prefix": "func",
+    "body": [
+      "func ${1:name}(${2:params}) ${3:-> ${4:ReturnType} }{",
+      "\t${0}",
+      "}"
+    ],
+    "description": "Function definition"
+  },
+  "Class": {
+    "prefix": "class",
+    "body": [
+      "class ${1:ClassName} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "Class definition"
+  },
+  "Struct": {
+    "prefix": "struct",
+    "body": [
+      "struct ${1:StructName} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "Struct definition"
+  },
+  "Enum": {
+    "prefix": "enum",
+    "body": [
+      "enum ${1:EnumName} {",
+      "\tcase ${0}",
+      "}"
+    ],
+    "description": "Enum definition"
+  },
+  "Protocol": {
+    "prefix": "protocol",
+    "body": [
+      "protocol ${1:ProtocolName} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "Protocol definition"
+  },
+  "Extension": {
+    "prefix": "extension",
+    "body": [
+      "extension ${1:TypeName} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "Extension definition"
+  },
+  "If Statement": {
+    "prefix": "if",
+    "body": [
+      "if ${1:condition} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "If statement"
+  },
+  "If Let": {
+    "prefix": "iflet",
+    "body": [
+      "if let ${1:unwrapped} = ${2:optional} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "If-let optional binding"
+  },
+  "Guard": {
+    "prefix": "guard",
+    "body": [
+      "guard ${1:condition} else {",
+      "\t${0:return}",
+      "}"
+    ],
+    "description": "Guard statement"
+  },
+  "Guard Let": {
+    "prefix": "guardlet",
+    "body": [
+      "guard let ${1:unwrapped} = ${2:optional} else {",
+      "\t${0:return}",
+      "}"
+    ],
+    "description": "Guard-let optional binding"
+  },
+  "For Loop": {
+    "prefix": "for",
+    "body": [
+      "for ${1:item} in ${2:collection} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "For-in loop"
+  },
+  "While Loop": {
+    "prefix": "while",
+    "body": [
+      "while ${1:condition} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "While loop"
+  },
+  "Switch": {
+    "prefix": "switch",
+    "body": [
+      "switch ${1:value} {",
+      "case ${2:pattern}:",
+      "\t${0}",
+      "default:",
+      "\tbreak",
+      "}"
+    ],
+    "description": "Switch statement"
+  },
+  "Do-Catch": {
+    "prefix": "docatch",
+    "body": [
+      "do {",
+      "\t${1:try expression}",
+      "} catch ${2:pattern} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "Do-catch error handling"
+  },
+  "Property": {
+    "prefix": "prop",
+    "body": [
+      "${1|var,let|} ${2:name}: ${3:Type}${0}"
+    ],
+    "description": "Property declaration"
+  },
+  "Computed Property": {
+    "prefix": "computed",
+    "body": [
+      "var ${1:name}: ${2:Type} {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "Computed property"
+  },
+  "Init": {
+    "prefix": "init",
+    "body": [
+      "init(${1:params}) {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "Initializer"
+  },
+  "Print": {
+    "prefix": "print",
+    "body": [
+      "print(${0})"
+    ],
+    "description": "Print statement"
+  },
+  "Mark": {
+    "prefix": "mark",
+    "body": [
+      "// MARK: - ${0}"
+    ],
+    "description": "MARK comment"
+  },
+  "TODO": {
+    "prefix": "todo",
+    "body": [
+      "// TODO: ${0}"
+    ],
+    "description": "TODO comment"
+  },
+  "FIXME": {
+    "prefix": "fixme",
+    "body": [
+      "// FIXME: ${0}"
+    ],
+    "description": "FIXME comment"
+  }
+}
