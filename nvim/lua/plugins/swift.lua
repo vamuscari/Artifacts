@@ -37,20 +37,20 @@ return {
 
       -- Key mappings for xcodebuild
       local opts = { silent = true }
-      vim.keymap.set("n", "<leader>xb", "<cmd>XcodebuildBuild<cr>", vim.tbl_extend("force", opts, { desc = "[X]code [B]uild" }))
-      vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Build & [R]un" }))
-      vim.keymap.set("n", "<leader>xt", "<cmd>XcodebuildTest<cr>", vim.tbl_extend("force", opts, { desc = "[X]code [T]est" }))
-      vim.keymap.set("n", "<leader>xT", "<cmd>XcodebuildTestClass<cr>", vim.tbl_extend("force", opts, { desc = "[X]code [T]est Class" }))
-      vim.keymap.set("n", "<leader>x.", "<cmd>XcodebuildTestSelected<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Test Selected" }))
-      vim.keymap.set("n", "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Toggle [C]ode Coverage" }))
-      vim.keymap.set("n", "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Show [C]overage Report" }))
-      vim.keymap.set("n", "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Toggle [L]ogs" }))
-      vim.keymap.set("n", "<leader>xs", "<cmd>XcodebuildSelectScheme<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Select [S]cheme" }))
-      vim.keymap.set("n", "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Select [D]evice" }))
-      vim.keymap.set("n", "<leader>xp", "<cmd>XcodebuildPicker<cr>", vim.tbl_extend("force", opts, { desc = "[X]code [P]icker" }))
-      vim.keymap.set("n", "<leader>xq", "<cmd>Telescope quickfix<cr>", vim.tbl_extend("force", opts, { desc = "[X]code [Q]uickfix" }))
-      vim.keymap.set("n", "<leader>xx", "<cmd>XcodebuildQuickfixLine<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Quickfi[x] Line" }))
-      vim.keymap.set("n", "<leader>xa", "<cmd>XcodebuildCodeActions<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Code [A]ctions" }))
+      vim.keymap.set("n", "<leader>Xb", "<cmd>XcodebuildBuild<cr>", vim.tbl_extend("force", opts, { desc = "[X]code [B]uild" }))
+      vim.keymap.set("n", "<leader>Xr", "<cmd>XcodebuildBuildRun<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Build & [R]un" }))
+      vim.keymap.set("n", "<leader>Xt", "<cmd>XcodebuildTest<cr>", vim.tbl_extend("force", opts, { desc = "[X]code [T]est" }))
+      vim.keymap.set("n", "<leader>XT", "<cmd>XcodebuildTestClass<cr>", vim.tbl_extend("force", opts, { desc = "[X]code [T]est Class" }))
+      vim.keymap.set("n", "<leader>X.", "<cmd>XcodebuildTestSelected<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Test Selected" }))
+      vim.keymap.set("n", "<leader>Xc", "<cmd>XcodebuildToggleCodeCoverage<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Toggle [C]ode Coverage" }))
+      vim.keymap.set("n", "<leader>XC", "<cmd>XcodebuildShowCodeCoverageReport<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Show [C]overage Report" }))
+      vim.keymap.set("n", "<leader>Xl", "<cmd>XcodebuildToggleLogs<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Toggle [L]ogs" }))
+      vim.keymap.set("n", "<leader>Xs", "<cmd>XcodebuildSelectScheme<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Select [S]cheme" }))
+      vim.keymap.set("n", "<leader>Xd", "<cmd>XcodebuildSelectDevice<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Select [D]evice" }))
+      vim.keymap.set("n", "<leader>Xp", "<cmd>XcodebuildPicker<cr>", vim.tbl_extend("force", opts, { desc = "[X]code [P]icker" }))
+      vim.keymap.set("n", "<leader>Xq", "<cmd>Telescope quickfix<cr>", vim.tbl_extend("force", opts, { desc = "[X]code [Q]uickfix" }))
+      vim.keymap.set("n", "<leader>Xx", "<cmd>XcodebuildQuickfixLine<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Quickfi[x] Line" }))
+      vim.keymap.set("n", "<leader>Xa", "<cmd>XcodebuildCodeActions<cr>", vim.tbl_extend("force", opts, { desc = "[X]code Code [A]ctions" }))
     end,
   },
 
@@ -60,8 +60,6 @@ return {
     opts = function(_, opts)
       -- Ensure sourcekit-lsp is configured if available
       if vim.fn.executable("sourcekit-lsp") == 1 then
-        local lspconfig = require("lspconfig")
-
         -- Get capabilities from cmp_nvim_lsp
         local capabilities = vim.lsp.protocol.make_client_capabilities()
         capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
@@ -72,18 +70,17 @@ return {
           dynamicRegistration = true,
         }
 
-        -- Configure sourcekit-lsp manually since Mason doesn't support it
-        lspconfig.sourcekit.setup({
+        -- Configure sourcekit-lsp manually since Mason doesn't support it using new vim.lsp.config API
+        vim.lsp.config("sourcekit", {
           cmd = { "sourcekit-lsp" },
           filetypes = { "swift", "c", "cpp", "objective-c", "objective-cpp" },
           capabilities = capabilities,
+          root_markers = { "Package.swift", ".git" },
           root_dir = function(filename)
             -- Look for Package.swift, Xcode project, or git repo
-            return lspconfig.util.root_pattern("Package.swift", "*.xcodeproj", "*.xcworkspace")(filename)
-              or lspconfig.util.find_git_ancestor(filename)
-              or lspconfig.util.path.dirname(filename)
+            return vim.fs.root(0, { "Package.swift", "*.xcodeproj", "*.xcworkspace", ".git" })
+              or vim.fs.dirname(filename)
           end,
-          settings = {},
         })
       end
     end,

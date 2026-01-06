@@ -77,12 +77,6 @@ set("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
 -- new file
 set("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
 
-set("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
-set("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
-
-set("n", "[q", vim.cmd.cprev, { desc = "Previous Quickfix" })
-set("n", "]q", vim.cmd.cnext, { desc = "Next Quickfix" })
-
 -- diagnostic
 local diagnostic_goto = function(next, severity)
   local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev

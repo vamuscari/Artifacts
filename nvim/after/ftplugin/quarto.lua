@@ -35,13 +35,6 @@ vim.keymap.set(
   ":MoltenEvaluateOperator<CR>",
   { desc = "[M]olten [E]valuate [O]perator", silent = false }
 )
-
-vim.keymap.set(
-  "n",
-  "<localleader>meo",
-  ":MoltenEvaluateOperator<CR>",
-  { desc = "[M]olten [E]valuate [O]perator", silent = false }
-)
 vim.keymap.set(
   "n",
   "<localleader>mea",

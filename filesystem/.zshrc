@@ -29,12 +29,12 @@ fi
 
 export CLICOLOR=1
 
+
 alias ls='ls -G'
 alias ll='ls -lG'
 
 # Tmux Alias
-alias tt='tmux new-session -A -s Home -c ~'
-
+alias ts='tmux new-session -A -s Home -c ~'
 
 
 # adding color to man
@@ -46,8 +46,15 @@ nman() { exec man $1 | nvimpager }
 
 alias :q='exit'
 alias vim='nvim'
+
+# Local User in path 
 PATH="/usr/local/bin:$PATH"
+
+# Brew in path
 PATH="/opt/homebrew/bin:$PATH"
+
+# Cargo in path
+export PATH="$HOME/.cargo/bin:$PATH"
 
 export DEV_CERT=$HOME"/.local/certs/dev.cer"
 export DEV_KEY=$HOME"/.local/certs/dev.pem"
@@ -57,6 +64,12 @@ source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # zsh theme powerlevel10k
 source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
+
+# Go Path
+export PATH=$PATH:$(go env GOPATH)/bin
+
+# Prefered Editor
+export EDITOR=vim
 
 # Set up fzf key bindings and fuzzy completion
 # source "$(fzf --zsh)"
@@ -90,3 +103,11 @@ source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# BadgerMaps CLI autocompletion
+source /Users/vanmuscari/.config/badgermaps/autocomplete.sh
+
+# Added by Codex CLI: ensure ~/.local/bin is on PATH
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+  export PATH="$HOME/.local/bin:$PATH"
+fi

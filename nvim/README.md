@@ -6,3 +6,6 @@
 ## references
 - [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim)
 - [lazy.nvim](https://github.com/folke/lazy.nvim)
+
+## keybindings
+See [KEYBINDINGS.md](KEYBINDINGS.md) for the leader/localleader layout and naming conventions.

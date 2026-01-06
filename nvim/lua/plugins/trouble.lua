@@ -3,15 +3,15 @@ return {
   cmd = "Trouble",
   opts = { use_diagnostic_signs = true },
   keys = {
-    { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
-    { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.bug=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
-    { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
-    { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
-    { "<leader>ct", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Buffer Diagnostics (Trouble)" },
+    { "<leader>xd", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
+    { "<leader>xb", "<cmd>Trouble diagnostics toggle filter.bug=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+    { "<leader>xl", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
+    { "<leader>xq", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
+    { "<leader>xs", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Symbols (Trouble)" },
     {
-      "<leader>cl",
+      "<leader>xc",
       "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
-      desc = "Buffer Diagnostics (Trouble)",
+      desc = "LSP Definitions (Trouble)",
     },
     {
       "[q",

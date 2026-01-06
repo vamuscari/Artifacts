@@ -25,6 +25,8 @@ opt.shada = { "'10", "<0", "s10", "h" }
 
 opt.clipboard = "unnamedplus"
 
+opt.undofile = true
+
 opt.laststatus = 0
 opt.ruler = false
 opt.showcmd = false

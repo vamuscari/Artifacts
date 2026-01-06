@@ -6,7 +6,7 @@ return {
       library = {
         -- See the configuration section for more details
         -- Load luvit types when the `vim.uv` word is found
-        { path = "luvit-meta/library", words = { "vim%.uv" } },
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
       },
     },
   },
@@ -15,7 +15,7 @@ return {
     "hrsh7th/vim-vsnip",
     config = function()
       -- Set vsnip snippet directory
-      vim.g.vsnip_snippet_dir = vim.fn.stdpath("config") .. "/snippets"
+      vim.g.vsnip_snippet_dir = vim.fn.stdpath "config" .. "/snippets"
     end,
   },
   {

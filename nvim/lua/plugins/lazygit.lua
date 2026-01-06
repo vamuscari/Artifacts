@@ -21,7 +21,7 @@ return {
     },
     {
       "<leader>gf",
-      ":LazyGit<CR>",
+      ":LazyGitCurrentFile<CR>",
       desc = "LazyGit Current File",
     },
   },
